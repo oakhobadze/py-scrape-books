@@ -29,7 +29,7 @@ class BookScrapperSpider(scrapy.Spider):
         stock_text = extract_with_css('p.instock.availability::text')
         item['amount_in_stock'] = ''.join(filter(str.isdigit, stock_text))
         item['rating'] = response.css('p.star-rating').attrib['class'].split()[-1]
-        item['category'] = response.css('ul.breadcrumb li a::text')[-2].get()
+        item['category'] = response.css('ul.breadcrumb li a::text').getall()[-2]
 
         item['description'] = extract_with_css('#product_description ~ p::text')
         item['upc'] = response.css('table.table.table-striped tr:nth-child(1) td::text').get()
