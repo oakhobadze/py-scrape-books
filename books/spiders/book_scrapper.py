@@ -1,5 +1,6 @@
 import scrapy
 from scrapy.http import Response
+from books.items import BooksItem
 
 class BookScrapperSpider(scrapy.Spider):
     name = "book_scrapper"
@@ -22,22 +23,15 @@ class BookScrapperSpider(scrapy.Spider):
         def extract_with_css(query):
             return response.css(query).get(default='').strip()
 
-        title = extract_with_css('div.product_main h1::text')
-        price = extract_with_css('p.price_color::text')
+        item = BooksItem()
+        item['title'] = extract_with_css('div.product_main h1::text')
+        item['price'] = extract_with_css('p.price_color::text')
         stock_text = extract_with_css('p.instock.availability::text')
-        amount_in_stock = ''.join(filter(str.isdigit, stock_text))
-        rating = response.css('p.star-rating').attrib['class'].split()[-1]
+        item['amount_in_stock'] = ''.join(filter(str.isdigit, stock_text))
+        item['rating'] = response.css('p.star-rating').attrib['class'].split()[-1]
+        item['category'] = response.css('ul.breadcrumb li a::text')[-2].get()
 
-        category = response.css('ul.breadcrumb li a::text')[-1].get()
-        description = extract_with_css('#product_description ~ p::text')
-        upc = response.css('table.table.table-striped tr:nth-child(1) td::text').get()
+        item['description'] = extract_with_css('#product_description ~ p::text')
+        item['upc'] = response.css('table.table.table-striped tr:nth-child(1) td::text').get()
 
-        yield {
-            'title': title,
-            'price': price,
-            'amount_in_stock': amount_in_stock,
-            'rating': rating,
-            'category': category,
-            'description': description,
-            'upc': upc,
-        }
+        yield item

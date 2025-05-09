@@ -17,7 +17,12 @@ NEWSPIDER_MODULE = "books.spiders"
 #USER_AGENT = "books (+http://www.yourdomain.com)"
 
 # Obey robots.txt rules
-ROBOTSTXT_OBEY = True
+ROBOTSTXT_OBEY = False
+
+ITEM_PIPELINES = {
+    'books.pipelines.BooksPipeline': 300,
+}
+
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32
